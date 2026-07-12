@@ -97,7 +97,7 @@
 
 1. **Deploy the chart to your cluster**
    ```bash
-   helm install my-webapp ./simple-webapp
+   helm upgrade --install my-webapp ./simple-webapp
    ```
 
 2. **Verify the release was created**

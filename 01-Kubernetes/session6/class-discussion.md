@@ -460,3 +460,11 @@ Pod
 ```
 
 ---
+
+
+Different ways to create pods in Kubernetes:
+
+1.) Pods
+2.) Deployments -> Pod/s | Use case: Application run using deployments
+3.) DaemonSets -> Pod/s | Use case: monitoring agents, networking softwares etc.
+4.) Statefulsets -> Pod/s | Use case: To run persistent volume with fixed identity in K8S

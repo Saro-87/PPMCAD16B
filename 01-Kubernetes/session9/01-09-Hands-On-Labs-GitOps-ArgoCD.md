@@ -29,8 +29,10 @@ In these labs, you'll set up ArgoCD, deploy applications using Git as the source
 
 2. **Install ArgoCD using the official manifest:**
    ```bash
-   kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+   kubectl apply -n argocd --server-side --force-conflicts -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
    ```
+
+   Ref: https://argo-cd.readthedocs.io/en/latest/getting_started/
 
 3. **Verify all ArgoCD pods are running:**
    ```bash
@@ -44,9 +46,21 @@ In these labs, you'll set up ArgoCD, deploy applications using Git as the source
    ```
    Save this password temporarily.
 
+   or for powershell:
+
+   ```powershell
+   [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String((kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}")))
+   ```
+
 5. **Port-forward to the ArgoCD API server:**
    ```bash
    kubectl port-forward -n argocd svc/argocd-server 8080:443 &
+   ```
+
+   or for powershell:
+   
+   ```powershell
+   kubectl port-forward -n argocd svc/argocd-server 8080:443
    ```
 
 6. **Access the UI:**
