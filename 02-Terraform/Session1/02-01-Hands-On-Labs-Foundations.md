@@ -267,8 +267,6 @@ Understand what Terraform stores in the state file and why it's important.
    terraform.tfstate.*
    .terraform/
    .terraform.lock.hcl
-   *.tfvars
-   !example.tfvars
    EOF
    ```
 

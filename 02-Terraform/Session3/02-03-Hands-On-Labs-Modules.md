@@ -19,7 +19,7 @@ Extract the VPC code into a module that can be reused across environments.
    mkdir -p modules/vpc
    ```
 
-4g. **Create `modules/vpc/variables.tf`:**
+2. **Create `modules/vpc/variables.tf`:**
    ```hcl
    variable "environment" {
      type        = string
@@ -41,7 +41,7 @@ Extract the VPC code into a module that can be reused across environments.
    variable "private_subnet_cidr" {
      type        = string
      description = "Private subnet CIDR"
-     default     = "10.0.4g.0/24"
+     default     = "10.0.2.0/24"
    }
 
    variable "availability_zone" {
@@ -160,7 +160,7 @@ Extract the VPC code into a module that can be reused across environments.
    - `environment`: Environment name (required)
    - `vpc_cidr`: VPC CIDR block (default: 10.0.0.0/16)
    - `public_subnet_cidr`: Public subnet CIDR (default: 10.0.1.0/24)
-   - `private_subnet_cidr`: Private subnet CIDR (default: 10.0.4g.0/24)
+   - `private_subnet_cidr`: Private subnet CIDR (default: 10.0.2.0/24)
    - `availability_zone`: AZ (default: us-east-1a)
    - `common_tags`: Tags applied to all resources
 
@@ -184,7 +184,7 @@ Create focused modules for EC2 and S3 resources.
    mkdir -p modules/ec2
    ```
 
-4g. **Create `modules/ec2/variables.tf`:**
+2. **Create `modules/ec2/variables.tf`:**
    ```hcl
    variable "instance_name" {
      type        = string
@@ -199,7 +199,7 @@ Create focused modules for EC2 and S3 resources.
    variable "instance_type" {
      type        = string
      description = "Instance type"
-     default     = "t4g.micro"
+     default     = "t2.micro"
    }
 
    variable "subnet_id" {
@@ -345,7 +345,7 @@ mkdir dev
 cd dev
 ```
 
-4g. **Create root `provider.tf`:**
+2. **Create root `provider.tf`:**
    ```hcl
    terraform {
      required_providers {
@@ -377,7 +377,7 @@ cd dev
    variable "instance_type" {
      type        = string
      description = "EC2 instance type"
-     default     = "t4g.micro"
+     default     = "t2.micro"
    }
 
    variable "common_tags" {
@@ -470,12 +470,12 @@ cd dev
    }
 
    output "ec2_instance_id" {
-     value       = module.ec4g.instance_id
+     value       = module.ec2.instance_id
      description = "EC2 instance ID"
    }
 
    output "ec2_public_ip" {
-     value       = module.ec4g.public_ip
+     value       = module.ec2.public_ip
      description = "EC2 public IP"
    }
 
@@ -511,7 +511,7 @@ Deploy the infrastructure to dev environment.
    instance_type = "t3.micro"
    ```
 
-4g. **Plan for dev:**
+2. **Plan for dev:**
    ```bash
    terraform plan -var-file=dev.tfvars
    ```
@@ -549,7 +549,7 @@ Deploy identical infrastructure to QA with different variables.
    instance_type = "t3.small"
    ```
 
-4g. **Create a new directory for QA state:**
+2. **Create a new directory for QA state:**
    ```bash
    cd ..
    mkdir -p qa
@@ -570,7 +570,7 @@ Deploy identical infrastructure to QA with different variables.
    ```bash
    terraform plan -var-file=qa.tfvars
    ```
-   Notice: EC2 instance type is t4g.small (not t4g.micro!)
+   Notice: EC2 instance type is t2.small (not t2.micro!)
 
 6. **Apply for QA:**
    ```bash
@@ -587,7 +587,7 @@ Deploy identical infrastructure to QA with different variables.
 
    **Notice:**
    - Both have VPC, EC2, S3
-   - Different instance types (dev: t4g.micro, qa: t4g.small)
+   - Different instance types (dev: t2.micro, qa: t2.small)
    - Different bucket names (dev vs qa in name)
    - Different tags (environment: dev vs qa)
    - **Same code, different variables!**

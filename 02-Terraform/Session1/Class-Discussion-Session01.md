@@ -1,16 +1,45 @@
 # Session 1: Terraform Fundamentals — Discussion Guide
 
+
+What do you understand by Infrastructure as Code (IAC)
+
+- Everything is scripted in a code
+- put everything in code, so that we can bulk operations at once
+- the code which is intended for provisioning infra
+
+
+
 ## Discussion Topic 1: Infrastructure as Code vs. Manual vs. Scripts
 
-### Opening Question
-"What are the pain points of manually deploying infrastructure via AWS Console? How is that different from writing shell scripts to automate it?"
+
+
+What are the pain points of manually deploying infrastructure via AWS Console?
+
+- time consuming
+- error prone
+- missing configuration
+
+----> Best approach doing manually:
+  - Detailed Runbooks, wherein each and every step was documented with screenshot / SOP
+
+
+----> Writing scripts (Shell / Bash, Powershell)
+  - OS dependency
+  - Chances of failing or crashing
+  - Error Handling (suppose I define in the shell script that I need an S3 bucket, the script ran successfully and the bucket was created, next time when I run the script it will fail)
+  - No idempotency 
+  - Drift Detection (in your script you mentioned 5 VMs with 100 GB storage, somebody manually changed this from 100 GB to 200 GB)
+
+
+How is that different from writing shell scripts to automate it?
+
 
 ### Discussion Points
 
 **Manual (AWS Console/CLI)**
 - Easy for one-offs, but:
   - No reproducibility across regions/accounts
-  - No version control or audit trail
+  - No version control
   - Configuration drift: server state differs from "intended"
   - Hard to scale (deploy to 10 regions = 10x clicking)
   - Team collaboration is error-prone
