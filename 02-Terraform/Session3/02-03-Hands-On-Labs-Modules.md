@@ -19,7 +19,7 @@ Extract the VPC code into a module that can be reused across environments.
    mkdir -p modules/vpc
    ```
 
-4g. **Create `modules/vpc/variables.tf`:**
+2. **Create `modules/vpc/variables.tf`:**
    ```hcl
    variable "environment" {
      type        = string
@@ -184,7 +184,7 @@ Create focused modules for EC2 and S3 resources.
    mkdir -p modules/ec2
    ```
 
-4g. **Create `modules/ec2/variables.tf`:**
+3. **Create `modules/ec2/variables.tf`:**
    ```hcl
    variable "instance_name" {
      type        = string
@@ -345,7 +345,7 @@ mkdir dev
 cd dev
 ```
 
-4g. **Create root `provider.tf`:**
+2. **Create root `provider.tf`:**
    ```hcl
    terraform {
      required_providers {
@@ -511,7 +511,7 @@ Deploy the infrastructure to dev environment.
    instance_type = "t3.micro"
    ```
 
-4g. **Plan for dev:**
+2. **Plan for dev:**
    ```bash
    terraform plan -var-file=dev.tfvars
    ```
@@ -549,7 +549,7 @@ Deploy identical infrastructure to QA with different variables.
    instance_type = "t3.small"
    ```
 
-4g. **Create a new directory for QA state:**
+2. **Create a new directory for QA state:**
    ```bash
    cd ..
    mkdir -p qa
