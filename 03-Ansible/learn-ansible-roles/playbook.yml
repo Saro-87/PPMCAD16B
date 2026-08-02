@@ -1,0 +1,7 @@
+---
+- name: Configure web servers with Nginx and Java
+  hosts: web
+  become: true
+  roles:
+    - nginx
+    - java
