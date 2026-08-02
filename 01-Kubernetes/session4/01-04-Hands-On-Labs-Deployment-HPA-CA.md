@@ -574,7 +574,21 @@ spec:
         value: 50
         periodSeconds: 60
 ```
+### 3. Create service: `app-svc.yaml`
 
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: hpa-demo
+spec:
+  selector:
+    app: hpa-demo
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
+```
 
 ### Steps:
 
@@ -582,6 +596,7 @@ spec:
    ```bash
    kubectl apply -f app-deployment.yaml
    kubectl apply -f hpa.yaml
+   kubectl apply -f app-svc.yaml
    ```
 
 2. **Verify HPA creation**:
@@ -623,8 +638,6 @@ spec:
 
 2. **Generate load** (Terminal 3):
    ```bash
-   # Get the service IP or LoadBalancer endpoint
-   SERVICE_IP=$(kubectl get svc hpa-demo -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
    # Generate continuous HTTP requests (using kubectl run)
    kubectl run -it --rm load-generator --image=busybox /bin/sh
@@ -653,44 +666,21 @@ spec:
 
 **Why is this needed?** HPA scales pods, but if the existing nodes don't have enough capacity for those new pods, they remain in `Pending` state. The Cluster Autoscaler watches for unschedulable pods and automatically adds nodes by adjusting the EC2 Auto Scaling Group (ASG) desired capacity. It also removes underutilized nodes to save costs.
 
-### Step 1: Verify Your Node Group's ASG Configuration
+## Step 1: Update the EKS managed node group scaling configuration
 
-Before installing the Cluster Autoscaler, check your node group's Auto Scaling Group settings and increase the maximum capacity to allow scaling:
+For EKS managed node groups, update the node group scaling configuration instead of directly changing the underlying Auto Scaling Group.
 
-```bash
-# Find the ASG name for your cluster
-# Replace <your-cluster-name> with your actual EKS cluster name
-export CLUSTER_NAME=<your-cluster-name>
+Set:
 
-aws autoscaling describe-auto-scaling-groups \
-  --query "AutoScalingGroups[? Tags[? (Key=='eks:cluster-name') && Value=='${CLUSTER_NAME}']].[AutoScalingGroupName, MinSize, MaxSize, DesiredCapacity]" \
-  --output table
-```
-
-Increase the max capacity to allow the autoscaler room to add nodes:
-
-```bash
-# Get the ASG name
-export ASG_NAME=$(aws autoscaling describe-auto-scaling-groups \
-  --query "AutoScalingGroups[? Tags[? (Key=='eks:cluster-name') && Value=='${CLUSTER_NAME}']].AutoScalingGroupName" \
-  --output text)
-
-# Update max capacity (e.g., allow up to 5 nodes)
-aws autoscaling update-auto-scaling-group \
-  --auto-scaling-group-name ${ASG_NAME} \
-  --min-size 2 \
-  --desired-capacity 2 \
-  --max-size 5
-
-# Verify the updated values
-aws autoscaling describe-auto-scaling-groups \
-  --query "AutoScalingGroups[? Tags[? (Key=='eks:cluster-name') && Value=='${CLUSTER_NAME}']].[AutoScalingGroupName, MinSize, MaxSize, DesiredCapacity]" \
-  --output table
-```
+- Minimum nodes: `2`
+- Desired nodes: `2`
+- Maximum nodes: `5`
 
 ### Step 2: Create an IAM Policy for Cluster Autoscaler
 
 The Cluster Autoscaler needs permissions to describe and modify Auto Scaling Groups.
+
+You can do this following the below steps or directly via the AWS console
 
 1. Create the policy JSON file:
 
@@ -725,41 +715,38 @@ aws iam create-policy \
   --policy-document file://cluster-autoscaler-policy.json
 ```
 
-Note the **Policy ARN** from the output — you will need it in Step 3.
+Note the **Policy ARN** from the output, you will need it in Step 3.
 
 ### Step 3: Create an IAM Role for the Cluster Autoscaler Service Account
 
+
+Pre-req: Confirm the EKS OIDC provider
+- Go to EKS console
+- From the Overview Page, Get the OIDC provider URL
+- Cluster Autoscaler will use IAM Roles for Service Accounts, also called IRSA.
+
+Main Steps:
 - Open the IAM console at https://console.aws.amazon.com/iam/.
 - In the left navigation pane, choose **Roles**.
 - On the Roles page, choose **Create role**.
 - On the Select trusted entity page, do the following:
   - In the Trusted entity type section, choose **Web identity**.
-  - For Identity provider, choose the **OpenID Connect provider URL** for your cluster (as shown under Overview in Amazon EKS).
-  - For Audience, choose **sts.amazonaws.com**.
+    - For Identity provider, click **Create New**, select **OpenID Connect**
+    - Add the **OIDC provider URL** copied above from the EKS console
+    - Add the **Audience** as **sts.amazonaws.com**
+    - Add provider
+  - Once above details are added, Choose the **OpenID Connect provider URL** for your cluster (as added above).
+  - For Audience, choose **sts.amazonaws.com**
   - Choose **Next**.
 - On the Add permissions page, do the following:
-  - In the Filter policies box, enter **AmazonEKSClusterAutoscalerPolicy**.
-  - Select the check box to the left of the **AmazonEKSClusterAutoscalerPolicy** returned in the search.
+  - In the Filter policies box, enter **AmazonEKSClusterAutoscalerPolicy** or if any other policy name you have used above.
+  - Select the policy returned in the search.
   - Choose **Next**.
 - On the Name, review, and create page, do the following:
   - For Role name, enter **AmazonEKS_Cluster_Autoscaler_Role**.
   - Choose **Create role**.
-- After the role is created, choose the role in the console to open it for editing.
-- Choose the **Trust relationships** tab, and then choose **Edit trust policy**.
-- Find the line that looks similar to the following line:
-
-```
-"oidc.eks.region-code.amazonaws.com/id/CF856D2CC9C5E229C4C6D3D43B178C5E:aud": "sts.amazonaws.com"
-```
-
-- Add a comma to the end of the previous line, and then add the following line after it. Replace `region-code` with the AWS Region that your cluster is in. Replace `CF856D2CC9C5E229C4C6D3D43B178C5E` with your cluster's OIDC provider ID.
-
-```
-"oidc.eks.region-code.amazonaws.com/id/CF856D2CC9C5E229C4C6D3D43B178C5E:sub": "system:serviceaccount:kube-system:cluster-autoscaler"
-```
-
-- Choose **Update policy** to finish.
-- Note the **Role ARN** — you will need it in Step 4.
+- After the role is created
+- Note the **Role ARN**, you will need it in Step 4.
 
 ### Step 4: Deploy the Cluster Autoscaler
 
@@ -770,13 +757,13 @@ curl -o cluster-autoscaler-autodiscover.yaml \
   https://raw.githubusercontent.com/kubernetes/autoscaler/master/cluster-autoscaler/cloudprovider/aws/examples/cluster-autoscaler-autodiscover.yaml
 ```
 
-2. Edit the manifest — replace `<YOUR CLUSTER NAME>` with your actual cluster name:
+2. Edit the manifest, `cluster-autoscaler-autodiscover.yaml`
 
-```bash
-sed -i "s/<YOUR CLUSTER NAME>/${CLUSTER_NAME}/g" cluster-autoscaler-autodiscover.yaml
-```
+2.a. replace `<YOUR CLUSTER NAME>` with your actual cluster name
 
-3. Annotate the Service Account in the manifest with the IAM role ARN. Open `cluster-autoscaler-autodiscover.yaml` and add the annotation under the ServiceAccount section:
+2.b. Annotate the Service Account in the manifest with the IAM role ARN. 
+
+Add the annotation under the ServiceAccount section:
 
 ```yaml
 apiVersion: v1
@@ -784,34 +771,32 @@ kind: ServiceAccount
 metadata:
   name: cluster-autoscaler
   namespace: kube-system
+  ## This need to added with actual Role ARN of the EKS Cluster Autoscaler Role Created above
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_ID>:role/AmazonEKS_Cluster_Autoscaler_Role
 ```
 
-4. Apply the manifest:
+2.c. Set the Cluster Autoscaler image to match your Kubernetes version. Check the [Cluster Autoscaler releases page](https://github.com/kubernetes/autoscaler/releases) for the version that matches your cluster:
+
+```bash
+# Check your cluster's Kubernetes version
+kubectl version --short
+# Update the image (replace v1.XX.X with the matching version)
+```
+
+3. Apply the manifest:
 
 ```bash
 kubectl apply -f cluster-autoscaler-autodiscover.yaml
 ```
 
-5. Add the safe-to-evict annotation to prevent the Cluster Autoscaler from evicting itself:
+4. Add the safe-to-evict annotation to prevent the Cluster Autoscaler from evicting itself:
 
 ```bash
 kubectl -n kube-system annotate deployment.apps/cluster-autoscaler \
   cluster-autoscaler.kubernetes.io/safe-to-evict="false"
 ```
 
-6. Set the Cluster Autoscaler image to match your Kubernetes version. Check the [Cluster Autoscaler releases page](https://github.com/kubernetes/autoscaler/releases) for the version that matches your cluster:
-
-```bash
-# Check your cluster's Kubernetes version
-kubectl version --short
-
-# Update the image (replace v1.XX.X with the matching version)
-kubectl set image deployment cluster-autoscaler \
-  -n kube-system \
-  cluster-autoscaler=registry.k8s.io/autoscaling/cluster-autoscaler:v1.XX.X
-```
 
 ### Step 5: Verify the Cluster Autoscaler is Running
 
@@ -860,14 +845,15 @@ Note the current number of nodes (e.g., 2).
 
 3. **Deploy a workload that requests more resources than available**:
 
+create a file ca-test-deployment.yaml:
+
 ```bash
-cat > ca-test-deployment.yaml <<EOF
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ca-test
 spec:
-  replicas: 15
+  replicas: 50
   selector:
     matchLabels:
       app: ca-test
@@ -883,10 +869,10 @@ spec:
           requests:
             cpu: "200m"
             memory: "128Mi"
-EOF
-
-kubectl apply -f ca-test-deployment.yaml
 ```
+Apply the file:
+kubectl apply -f ca-test-deployment.yaml
+
 
 4. **Observe the scaling behavior**:
 

@@ -1,0 +1,14 @@
+# Product Catalog Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-catalog-np-service
+spec:
+  selector:
+    app: product-catalog
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30080
+  type: NodePort

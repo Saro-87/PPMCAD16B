@@ -1,0 +1,10 @@
+# Order Service ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: order-service-config
+data:
+  DATABASE_URL: "postgres://user:password@order-db:5432/orders"
+  PAYMENT_GATEWAY: "https://payment.example.com"
+  ORDER_EXPIRY: "24h"
+  SHOPPING_CART_SERVICE_URL: "http://shopping-cart-service"

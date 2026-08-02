@@ -1,0 +1,53 @@
+# Product Catalog Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-catalog
+  labels:
+    app: product-catalog
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: product-catalog
+  template:
+    metadata:
+      labels:
+        app: product-catalog
+    spec:
+      containers:
+      - name: product-catalog
+        image: nginx:latest
+        volumeMounts:
+        - name: product-catalog-html-volume
+          mountPath: /usr/share/nginx/html/products
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        envFrom:
+        - configMapRef:
+            name: product-catalog-config
+        - secretRef:
+            name: product-catalog-secret
+      volumes:
+      - name: product-catalog-html-volume
+        configMap:
+          name: product-catalog-html-config
