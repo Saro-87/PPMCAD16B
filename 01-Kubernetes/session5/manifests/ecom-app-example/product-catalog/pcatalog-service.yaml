@@ -1,0 +1,13 @@
+# Product Catalog Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: product-catalog-service
+spec:
+  selector:
+    app: product-catalog
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP

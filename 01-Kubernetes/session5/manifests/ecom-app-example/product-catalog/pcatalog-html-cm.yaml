@@ -1,0 +1,13 @@
+# Product Catalog ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: product-catalog-html-config
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <body>
+        <h1>Hello, World, I am serving from Product Catalog!</h1>
+    </body>
+    </html>

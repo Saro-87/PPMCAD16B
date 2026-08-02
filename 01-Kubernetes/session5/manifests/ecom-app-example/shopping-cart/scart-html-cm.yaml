@@ -1,0 +1,13 @@
+# Shopping Cart ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shopping-cart-html-config
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <body>
+        <h1>Hello, World, I am serving from Shopping Cart!</h1>
+    </body>
+    </html>
