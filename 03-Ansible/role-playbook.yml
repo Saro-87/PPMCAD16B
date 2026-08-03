@@ -1,0 +1,7 @@
+---
+- name: Install Java
+  hosts: web
+  become: true
+  roles:
+    #- java
+    - "/mnt/e/Ansible/Anisble Roles/mysql"
