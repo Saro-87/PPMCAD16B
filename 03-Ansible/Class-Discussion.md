@@ -159,3 +159,8 @@ Ansible needs a list of which hosts to act on. That list is the **inventory**.
 
 - **Static inventory** — a file (INI or YAML) that lists hosts and groups by hand. Good when the set of servers is stable and known up front.
 - **Dynamic inventory** — Ansible asks an external source (AWS EC2, Azure, GCP, vSphere, ...) for the live list of hosts at runtime. Good for cloud environments where instances come and go.
+
+
+-------
+
+scaffolding: scaffolding refers to the process of automatically creating a standard project structure, configuration files, and boilerplate code so you can start a project quickly without building everything from scratch
