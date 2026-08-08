@@ -1,0 +1,8 @@
+---
+# defaults file for mysql
+
+mysql_root_password: "ChangeMe123!"
+mysql_database: app_db
+mysql_user: app_user
+mysql_user_password: "AppPassword123!"
+mysql_bind_address: "127.0.0.1"

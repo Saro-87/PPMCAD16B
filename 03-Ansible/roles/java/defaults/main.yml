@@ -1,0 +1,14 @@
+---
+# defaults file for java
+
+java_package_name: "openjdk-11-jdk"
+
+java_home: ""
+
+app_user: "rahat"
+
+app_group: "millenials"
+
+root_user: "root"
+
+root_group: "root"
