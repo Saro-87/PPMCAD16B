@@ -1,0 +1,163 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: monitoring
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s        # how often Prometheus pulls each target
+      evaluation_interval: 15s    # how often recording/alerting rules are evaluated
+      external_labels:
+        cluster: minikube
+
+    scrape_configs:
+
+      # ---------------------------------------------------------------
+      # 1. Prometheus scraping itself. Static target, no SD needed.
+      #    Gives you prometheus_* metrics: TSDB size, scrape durations,
+      #    HTTP request rates. Used later for the RED-method panels.
+      # ---------------------------------------------------------------
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ['localhost:9090']
+
+      # ---------------------------------------------------------------
+      # 2. Kubernetes API server.
+      #    role: endpoints discovers every Service endpoint in the cluster,
+      #    then relabel keeps only default/kubernetes:https.
+      # ---------------------------------------------------------------
+      - job_name: 'kubernetes-apiservers'
+        kubernetes_sd_configs:
+          - role: endpoints
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        relabel_configs:
+          - source_labels:
+              - __meta_kubernetes_namespace
+              - __meta_kubernetes_service_name
+              - __meta_kubernetes_endpoint_port_name
+            action: keep
+            regex: default;kubernetes;https
+
+      # ---------------------------------------------------------------
+      # 3. Kubelet metrics, reached through the API server proxy.
+      #    Avoids needing direct network access to port 10250 on each node.
+      # ---------------------------------------------------------------
+      - job_name: 'kubernetes-nodes'
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        kubernetes_sd_configs:
+          - role: node
+        relabel_configs:
+          - target_label: __address__
+            replacement: kubernetes.default.svc:443
+          - source_labels: [__meta_kubernetes_node_name]
+            regex: (.+)
+            target_label: __metrics_path__
+            replacement: /api/v1/nodes/${1}/proxy/metrics
+          - action: labelmap
+            regex: __meta_kubernetes_node_label_(.+)
+          - source_labels: [__meta_kubernetes_node_name]
+            target_label: node
+
+      # ---------------------------------------------------------------
+      # 4. cAdvisor: per-container CPU / memory / network / filesystem.
+      #    Same proxy trick, different path.
+      # ---------------------------------------------------------------
+      - job_name: 'kubernetes-cadvisor'
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        kubernetes_sd_configs:
+          - role: node
+        relabel_configs:
+          - target_label: __address__
+            replacement: kubernetes.default.svc:443
+          - source_labels: [__meta_kubernetes_node_name]
+            regex: (.+)
+            target_label: __metrics_path__
+            replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor
+          - action: labelmap
+            regex: __meta_kubernetes_node_label_(.+)
+          - source_labels: [__meta_kubernetes_node_name]
+            target_label: node
+
+      # ---------------------------------------------------------------
+      # 5. Opt-in pod discovery. Any pod annotated with
+      #      prometheus.io/scrape: "true"
+      #      prometheus.io/port:   "3000"
+      #      prometheus.io/path:   "/metrics"   (optional)
+      #    is scraped automatically. This is how application teams
+      #    onboard without touching the Prometheus config.
+      #
+      #    regex is quoted deliberately. Unquoted YAML true is a boolean;
+      #    Prometheus coerces it back to a string so it does load, but the
+      #    annotation VALUE is a string and quoting keeps the two sides
+      #    obviously symmetric.
+      # ---------------------------------------------------------------
+      - job_name: 'kubernetes-pods'
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            action: keep
+            regex: "true"
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+            action: replace
+            target_label: __metrics_path__
+            regex: (.+)
+          - source_labels:
+              - __address__
+              - __meta_kubernetes_pod_annotation_prometheus_io_port
+            action: replace
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+            target_label: __address__
+          - action: labelmap
+            regex: __meta_kubernetes_pod_label_(.+)
+          - source_labels: [__meta_kubernetes_namespace]
+            action: replace
+            target_label: kubernetes_namespace
+          - source_labels: [__meta_kubernetes_pod_name]
+            action: replace
+            target_label: kubernetes_pod_name
+
+      # ---------------------------------------------------------------
+      # 6. kube-state-metrics: the state of Kubernetes OBJECTS.
+      #    Not resource usage. Deployments, replicas, pod phase, restarts.
+      # ---------------------------------------------------------------
+      - job_name: 'kube-state-metrics'
+        kubernetes_sd_configs:
+          - role: endpoints
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_name]
+            regex: kube-state-metrics
+            action: keep
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: kubernetes_namespace
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: kubernetes_pod_name
+
+      # ---------------------------------------------------------------
+      # 7. node: OS and hardware metrics from Node Exporter on each node.
+      # The job name intentionally matches Grafana dashboard 1860.
+      # ---------------------------------------------------------------
+      - job_name: 'node'
+        kubernetes_sd_configs:
+          - role: endpoints
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_service_name]
+            regex: node-exporter
+            action: keep
+          - source_labels: [__meta_kubernetes_endpoint_node_name]
+            target_label: node
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: kubernetes_namespace
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: kubernetes_pod_name

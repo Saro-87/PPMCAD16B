@@ -1,0 +1,62 @@
+---
+# Applied only in Lab 5 to make the alert fire on demand.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: lab-workloads
+---
+# 1. Deliberately broken image tag.
+#    Result: pod stuck Pending/ImagePullBackOff.
+#    Surfaces as kube_pod_container_status_waiting_reason and
+#    kube_pod_status_phase{phase="Pending"}.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broken-app
+  namespace: lab-workloads
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: broken-app
+  template:
+    metadata:
+      labels:
+        app: broken-app
+    spec:
+      containers:
+        - name: app
+          image: nginx:this-tag-does-not-exist-9999
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+---
+# 2. CPU burner. Two replicas of a busy loop, capped at 300m each,
+#    enough to move container_cpu_usage_seconds_total visibly.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cpu-burner
+  namespace: lab-workloads
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cpu-burner
+  template:
+    metadata:
+      labels:
+        app: cpu-burner
+    spec:
+      containers:
+        - name: burner
+          image: busybox:1.36
+          command: ["/bin/sh", "-c", "while true; do :; done"]
+          resources:
+            requests:
+              cpu: 100m
+              memory: 16Mi
+            limits:
+              cpu: 300m
+              memory: 32Mi
