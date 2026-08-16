@@ -1,0 +1,48 @@
+{
+  "description": "Parse structured JSON app logs emitted on stdout",
+  "processors": [
+    {
+      "json": {
+        "field": "message",
+        "target_field": "app",
+        "ignore_failure": false
+      }
+    },
+    {
+      "date": {
+        "field": "app.@timestamp",
+        "formats": ["ISO8601"],
+        "target_field": "@timestamp",
+        "ignore_failure": true
+      }
+    },
+    {
+      "rename": {
+        "field": "app.level",
+        "target_field": "log.level",
+        "ignore_missing": true
+      }
+    },
+    {
+      "rename": {
+        "field": "app.message",
+        "target_field": "app.msg",
+        "ignore_missing": true
+      }
+    },
+    {
+      "remove": {
+        "field": "app.@timestamp",
+        "ignore_failure": true
+      }
+    }
+  ],
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.parse_error",
+        "value": "{{ _ingest.on_failure_message }}"
+      }
+    }
+  ]
+}

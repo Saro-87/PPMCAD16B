@@ -1,0 +1,133 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo
+---
+# 1. UNSTRUCTURED text logs, in the classic shape:
+#    <timestamp> app[<pid>] <LEVEL> <message>
+#    Extracting fields from these needs grok. That is the Lab 2 exercise.
+#
+#    Note the log_format label: Filebeat routes on THAT, not on app, so
+#    several workloads can share one ingest pipeline.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plain-logger
+  namespace: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: plain-logger
+  template:
+    metadata:
+      labels:
+        app: plain-logger
+        log_format: plain
+    spec:
+      containers:
+        - name: logger
+          image: busybox:1.36
+          command:
+            - /bin/sh
+            - -c
+            - |
+              i=0
+              while true; do
+                TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+                i=$(( (i + 1) % 10 ))
+                case $i in
+                  0) L=INFO;  M="User login successful user_id=42" ;;
+                  1) L=INFO;  M="Processing request id=abc123" ;;
+                  2) L=INFO;  M="Cache warmed entries=1180" ;;
+                  3) L=INFO;  M="Health check passed" ;;
+                  4) L=INFO;  M="Session created user_id=77" ;;
+                  5) L=INFO;  M="Config reloaded" ;;
+                  6) L=WARN;  M="High memory usage: 85%" ;;
+                  7) L=WARN;  M="Slow query took 2400ms" ;;
+                  8) L=ERROR; M="Database connection timeout" ;;
+                  9) L=ERROR; M="Payment gateway returned 503" ;;
+                esac
+                echo "$TS app[1234] $L $M"
+                sleep 3
+              done
+          resources:
+            requests: { cpu: 10m, memory: 16Mi }
+            limits:   { cpu: 100m, memory: 32Mi }
+---
+# 2. STRUCTURED JSON logs. The app already emitted its own fields.
+#    Lab 2 parses these with a json ingest processor, no regex at all.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: json-logger
+  namespace: demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: json-logger
+  template:
+    metadata:
+      labels:
+        app: json-logger
+        log_format: json
+    spec:
+      containers:
+        - name: logger
+          image: busybox:1.36
+          command:
+            - /bin/sh
+            - -c
+            - |
+              i=0
+              while true; do
+                TS=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+                i=$(( (i + 1) % 10 ))
+                if   [ $i -lt 7 ]; then LVL=info;  CODE=200; MSG="request completed"
+                elif [ $i -lt 9 ]; then LVL=warn;  CODE=429; MSG="rate limited"
+                else                    LVL=error; CODE=500; MSG="upstream failure"
+                fi
+                DUR=$(( (i * 37 + 11) % 900 + 20 ))
+                echo "{\"@timestamp\":\"$TS\",\"level\":\"$LVL\",\"message\":\"$MSG\",\"http\":{\"status_code\":$CODE},\"duration_ms\":$DUR,\"service\":\"checkout\"}"
+                sleep 3
+              done
+          resources:
+            requests: { cpu: 10m, memory: 16Mi }
+            limits:   { cpu: 100m, memory: 32Mi }
+---
+# 3. Error burst generator. Starts at 0 replicas.
+#    Lab 5 scales it up to make an alert fire on demand.
+#    Its own selector, so it does not fight plain-logger for pods, but the
+#    same log_format label so it reuses the same ingest pipeline.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: error-burst
+  namespace: demo
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: error-burst
+  template:
+    metadata:
+      labels:
+        app: error-burst
+        log_format: plain
+    spec:
+      containers:
+        - name: logger
+          image: busybox:1.36
+          command:
+            - /bin/sh
+            - -c
+            - |
+              while true; do
+                echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) app[9999] ERROR Database connection timeout"
+                sleep 1
+              done
+          resources:
+            requests: { cpu: 10m, memory: 16Mi }
+            limits:   { cpu: 100m, memory: 32Mi }

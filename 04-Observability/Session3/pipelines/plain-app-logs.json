@@ -1,0 +1,42 @@
+{
+  "description": "Parse unstructured app logs: <ts> app[<pid>] <LEVEL> <message>",
+  "processors": [
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "%{TIMESTAMP_ISO8601:app.timestamp} %{DATA:app.service}\\[%{NUMBER:app.pid:long}\\] %{LOGLEVEL:log.level} %{GREEDYDATA:app.message}"
+        ],
+        "ignore_failure": false
+      }
+    },
+    {
+      "date": {
+        "field": "app.timestamp",
+        "formats": ["ISO8601"],
+        "target_field": "@timestamp",
+        "ignore_failure": true
+      }
+    },
+    {
+      "lowercase": {
+        "field": "log.level",
+        "ignore_failure": true
+      }
+    },
+    {
+      "remove": {
+        "field": "app.timestamp",
+        "ignore_failure": true
+      }
+    }
+  ],
+  "on_failure": [
+    {
+      "set": {
+        "field": "event.parse_error",
+        "value": "{{ _ingest.on_failure_message }}"
+      }
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: filebeat
+  namespace: logging
+  labels:
+    app: filebeat
+spec:
+  selector:
+    matchLabels:
+      app: filebeat
+  template:
+    metadata:
+      labels:
+        app: filebeat
+    spec:
+      serviceAccountName: filebeat
+      terminationGracePeriodSeconds: 30
+      tolerations:
+        - operator: Exists          # collect from control-plane nodes too
+      containers:
+        - name: filebeat
+          image: docker.elastic.co/beats/filebeat:9.4.2
+          args: ["-c", "/etc/filebeat.yml", "-e"]
+          env:
+            # add_kubernetes_metadata uses this to only watch pods on THIS
+            # node, instead of every pod in the cluster.
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          securityContext:
+            # Container log files under /var/log/pods are root-owned.
+            runAsUser: 0
+            privileged: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 300Mi
+          volumeMounts:
+            - name: config
+              mountPath: /etc/filebeat.yml
+              readOnly: true
+              subPath: filebeat.yml
+            - name: data
+              mountPath: /usr/share/filebeat/data
+            - name: varlog
+              mountPath: /var/log
+              readOnly: true
+            - name: varlibdockercontainers
+              mountPath: /var/lib/docker/containers
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            defaultMode: 0640
+            name: filebeat-config
+        - name: varlog
+          hostPath:
+            path: /var/log
+        # /var/log/containers holds SYMLINKS. Under the docker runtime they
+        # point into /var/lib/docker/containers, so that path must be mounted
+        # too or Filebeat follows a dangling link and reads nothing.
+        - name: varlibdockercontainers
+          hostPath:
+            path: /var/lib/docker/containers
+            type: DirectoryOrCreate
+        # The registry: which file, which offset, already shipped.
+        # On hostPath so a Filebeat restart does not re-ship everything.
+        - name: data
+          hostPath:
+            path: /var/lib/filebeat-data
+            type: DirectoryOrCreate

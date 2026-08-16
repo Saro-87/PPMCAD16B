@@ -1,0 +1,94 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch
+  namespace: logging
+  labels:
+    app: elasticsearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      initContainers:
+        # Elasticsearch refuses to start unless the HOST kernel allows enough
+        # mmap regions. This is a bootstrap check that kills the pod, not a
+        # warning. Setting it from a privileged initContainer keeps the lab
+        # to a single kubectl apply.
+        - name: set-vm-max-map-count
+          image: busybox:1.36
+          command: ["sh", "-c", "sysctl -w vm.max_map_count=1048576"]
+          securityContext:
+            privileged: true
+            runAsUser: 0
+      containers:
+        - name: elasticsearch
+          image: docker.elastic.co/elasticsearch/elasticsearch:9.4.2
+          env:
+            - name: discovery.type
+              value: single-node
+            - name: cluster.name
+              value: logging-lab
+            # Security is OFF for the lab only. In production this is where
+            # TLS, the elastic user, and role-based access control live.
+            # Disable all four together; disabling only some produces
+            # confusing half-broken TLS failures.
+            - name: xpack.security.enabled
+              value: "false"
+            - name: xpack.security.enrollment.enabled
+              value: "false"
+            - name: xpack.security.http.ssl.enabled
+              value: "false"
+            - name: xpack.security.transport.ssl.enabled
+              value: "false"
+            - name: ES_JAVA_OPTS
+              value: "-Xms1g -Xmx1g"
+          ports:
+            - containerPort: 9200
+              name: http
+            - containerPort: 9300
+              name: transport
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1536Mi
+            limits:
+              cpu: "1"
+              memory: 2560Mi
+          readinessProbe:
+            httpGet:
+              path: /_cluster/health?wait_for_status=yellow&timeout=5s
+              port: 9200
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 12
+          volumeMounts:
+            - name: es-data
+              mountPath: /usr/share/elasticsearch/data
+      volumes:
+        # emptyDir: every indexed log is lost when the pod restarts.
+        # Fine for a lab, never for real log retention.
+        - name: es-data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+  namespace: logging
+  labels:
+    app: elasticsearch
+spec:
+  type: NodePort
+  selector:
+    app: elasticsearch
+  ports:
+    - name: http
+      port: 9200
+      targetPort: 9200

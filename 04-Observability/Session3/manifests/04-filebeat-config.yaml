@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-config
+  namespace: logging
+  labels:
+    app: filebeat
+data:
+  filebeat.yml: |-
+    # ------------------------------------------------------------------
+    # INPUT: every container log file on this node.
+    #
+    # /var/log/containers/*.log are symlinks created by the kubelet, named
+    # <pod>_<namespace>_<container>-<containerid>.log. That filename is the
+    # only clue to the log's identity, which is why the matcher below keys
+    # off the path.
+    # ------------------------------------------------------------------
+    filebeat.inputs:
+      - type: filestream
+        id: kubernetes-container-logs
+        paths:
+          - /var/log/containers/*.log
+        parsers:
+          # Handles both the CRI and the Docker JSON log formats, and
+          # reassembles lines the runtime split at 16KB.
+          - container: ~
+        prospector:
+          scanner:
+            symlinks: true
+
+    # ------------------------------------------------------------------
+    # PROCESSORS: this is the heart of Kubernetes logging.
+    #
+    # A raw container line has NO pod, namespace, node or label on it.
+    # add_kubernetes_metadata resolves the container ID from the file path
+    # against the API server and attaches kubernetes.* fields. Comment this
+    # block out and every log in Kibana becomes anonymous text.
+    # ------------------------------------------------------------------
+    processors:
+      - add_kubernetes_metadata:
+          host: ${NODE_NAME}
+          matchers:
+            - logs_path:
+                logs_path: "/var/log/containers/"
+      - add_host_metadata: ~
+      # Drop Filebeat's own logs so the lab doesn't feed on itself.
+      - drop_event:
+          when:
+            equals:
+              kubernetes.labels.app: "filebeat"
+
+    # ------------------------------------------------------------------
+    # OUTPUT: straight to Elasticsearch. No Logstash in this path.
+    #
+    # The `pipelines` block routes specific workloads through an ingest
+    # pipeline created in Lab 2. Parsing happens in Elasticsearch, at
+    # write time, which is where a modern Beats deployment puts it.
+    # ------------------------------------------------------------------
+    output.elasticsearch:
+      hosts: ["http://elasticsearch.logging.svc.cluster.local:9200"]
+      pipelines:
+        - pipeline: "plain-app-logs"
+          when.equals:
+            kubernetes.labels.log_format: "plain"
+        - pipeline: "json-app-logs"
+          when.equals:
+            kubernetes.labels.log_format: "json"
+
+    setup.ilm.enabled: true
+    setup.kibana:
+      host: "http://kibana.logging.svc.cluster.local:5601"
+
+    logging.level: info
