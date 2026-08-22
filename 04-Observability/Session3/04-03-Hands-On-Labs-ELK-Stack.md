@@ -21,7 +21,7 @@ kubectl version --client
 
 ### 1. Start Minikube
 
-Using the same instructions in session 2
+Using the same instructions in session 2, with minimum 2 CPU and 6 GB of RAM
 
 ### 2. Deploy the stack
 
