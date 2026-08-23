@@ -1,0 +1,143 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="BU9vwedKkQb7EJtd_oWx">
+    <mxGraphModel dx="2154" dy="1601" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-1" parent="1" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=12;fontStyle=0;container=1;pointerEvents=0;collapsible=0;recursiveResize=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_aws_cloud_alt;strokeColor=#232F3E;fillColor=none;verticalAlign=top;align=left;spacingLeft=30;fontColor=#232F3E;dashed=0;" value="AWS Cloud" vertex="1">
+          <mxGeometry height="560" width="850" x="-90" y="-120" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-2" parent="sAc8dC_QL7qjKVBoc4Ot-1" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=12;fontStyle=0;container=1;pointerEvents=0;collapsible=0;recursiveResize=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_vpc2;strokeColor=#8C4FFF;fillColor=none;verticalAlign=top;align=left;spacingLeft=30;fontColor=#AAB7B8;dashed=0;" value="&lt;b&gt;VPC - The network range within which the applications will run (&lt;/b&gt;&lt;span style=&quot;color: rgb(15, 20, 26); font-family: &amp;quot;Amazon Ember&amp;quot;, &amp;quot;Helvetica Neue&amp;quot;, Roboto, Arial, sans-serif; font-size: 14px; white-space: nowrap; background-color: rgb(255, 255, 255);&quot;&gt;10.40.0.0/16 - &lt;b&gt;10.40.0.0 to 10.40.255.255&lt;/b&gt;&lt;/span&gt;&lt;b&gt;)&lt;/b&gt;" vertex="1">
+          <mxGeometry height="440" width="760" x="50" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-3" parent="sAc8dC_QL7qjKVBoc4Ot-2" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=12;fontStyle=0;container=1;pointerEvents=0;collapsible=0;recursiveResize=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_security_group;grStroke=0;strokeColor=#7AA116;fillColor=#F2F6E8;verticalAlign=top;align=left;spacingLeft=30;fontColor=#248814;dashed=0;" value="Public subnet&amp;nbsp;&lt;span style=&quot;color: rgb(20, 126, 186);&quot;&gt;(ap-south-1a)&lt;/span&gt;" vertex="1">
+          <mxGeometry height="360" width="250" x="80" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-6" parent="sAc8dC_QL7qjKVBoc4Ot-3" style="rounded=0;whiteSpace=wrap;html=1;" value="Route Table&lt;div&gt;&lt;b&gt;&amp;lt;VPC CIDR&amp;gt; -&amp;gt; local&lt;br&gt;&lt;/b&gt;&lt;div&gt;0.0.0.0 -&amp;gt; IGW&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="190" x="20" y="78" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-8" parent="sAc8dC_QL7qjKVBoc4Ot-3" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;span style=&quot;color: rgb(15, 20, 26); font-family: &amp;quot;Amazon Ember&amp;quot;, &amp;quot;Helvetica Neue&amp;quot;, Roboto, Arial, sans-serif; font-size: 14px; text-align: start; white-space: nowrap; background-color: rgb(240, 251, 255);&quot;&gt;Prublic Subnet CIDR:&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(15, 20, 26); font-family: &amp;quot;Amazon Ember&amp;quot;, &amp;quot;Helvetica Neue&amp;quot;, Roboto, Arial, sans-serif; font-size: 14px; text-align: start; white-space: nowrap; background-color: rgb(240, 251, 255);&quot;&gt;10.40.0.0/18&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;color: rgb(15, 20, 26); font-family: &amp;quot;Amazon Ember&amp;quot;, &amp;quot;Helvetica Neue&amp;quot;, Roboto, Arial, sans-serif; font-size: 14px; text-align: start; white-space: nowrap; background-color: rgb(240, 251, 255);&quot;&gt;10.40.0.0 - 10.40.63.255&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="210" x="20" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-9" parent="sAc8dC_QL7qjKVBoc4Ot-3" style="rounded=0;whiteSpace=wrap;html=1;" value="Ec2: 10.40.0.4" vertex="1">
+          <mxGeometry height="60" width="120" x="40" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-32" parent="sAc8dC_QL7qjKVBoc4Ot-3" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;strokeColor=#232F3E;fillColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.nat_gateway;" value="NAT gateway" vertex="1">
+          <mxGeometry height="50" width="50" x="180" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-4" parent="sAc8dC_QL7qjKVBoc4Ot-2" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=12;fontStyle=0;container=1;pointerEvents=0;collapsible=0;recursiveResize=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_security_group;grStroke=0;strokeColor=#00A4A6;fillColor=#E6F6F7;verticalAlign=top;align=left;spacingLeft=30;fontColor=#147EBA;dashed=0;" value="Private subnet (ap-south-1b)" vertex="1">
+          <mxGeometry height="360" width="240" x="470" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-7" parent="sAc8dC_QL7qjKVBoc4Ot-4" style="rounded=0;whiteSpace=wrap;html=1;" value="Route Table&lt;div&gt;&lt;b&gt;&amp;lt;VPC CIDR&amp;gt; -&amp;gt; local&lt;/b&gt;&lt;/div&gt;&lt;div&gt;0.0.0.0 -&amp;gt; NATGW&lt;b&gt;&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="190" x="25" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-10" parent="sAc8dC_QL7qjKVBoc4Ot-4" style="rounded=0;whiteSpace=wrap;html=1;" value="RDS: 10.40.0.10&lt;div&gt;I have to download a new patch for the MYSQL database&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="160" x="45" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-13" parent="sAc8dC_QL7qjKVBoc4Ot-4" style="rounded=0;whiteSpace=wrap;html=1;" value="EC2: 10.40.0.15&lt;div&gt;I have to download Nginx&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="170" x="40" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-11" edge="1" parent="sAc8dC_QL7qjKVBoc4Ot-2" source="sAc8dC_QL7qjKVBoc4Ot-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="sAc8dC_QL7qjKVBoc4Ot-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-12" connectable="0" parent="sAc8dC_QL7qjKVBoc4Ot-11" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Using Private DNS or Private IP" vertex="1">
+          <mxGeometry relative="1" x="-0.1494" y="-2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-14" edge="1" parent="sAc8dC_QL7qjKVBoc4Ot-2" source="sAc8dC_QL7qjKVBoc4Ot-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="sAc8dC_QL7qjKVBoc4Ot-13">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="410" y="300" />
+              <mxPoint x="410" y="220" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-35" connectable="0" parent="sAc8dC_QL7qjKVBoc4Ot-14" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Using Private DNS or Private IP" vertex="1">
+          <mxGeometry relative="1" x="-0.383" y="2" as="geometry">
+            <mxPoint x="-1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-5" parent="sAc8dC_QL7qjKVBoc4Ot-1" style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#8C4FFF;strokeColor=none;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;pointerEvents=1;shape=mxgraph.aws4.internet_gateway;" value="Internet Gateway" vertex="1">
+          <mxGeometry height="50" width="50" x="25" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-17" edge="1" parent="1" source="sAc8dC_QL7qjKVBoc4Ot-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="sAc8dC_QL7qjKVBoc4Ot-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-16" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Actor" vertex="1">
+          <mxGeometry height="60" width="30" x="-428" y="-40" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-18" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Google.com" vertex="1">
+          <mxGeometry height="60" width="120" x="-400" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-19" edge="1" parent="1" source="sAc8dC_QL7qjKVBoc4Ot-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="sAc8dC_QL7qjKVBoc4Ot-18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-27" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="240" width="280" x="-380" y="-410" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-25" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Nginx Server" vertex="1">
+          <mxGeometry height="60" width="120" x="-300" y="-360" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-26" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="MySQL Server" vertex="1">
+          <mxGeometry height="60" width="120" x="-300" y="-270" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-28" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Internet" vertex="1">
+          <mxGeometry height="30" width="220" x="-360" y="-400" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-29" edge="1" parent="1" source="sAc8dC_QL7qjKVBoc4Ot-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="sAc8dC_QL7qjKVBoc4Ot-25">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="710" y="140" />
+              <mxPoint x="710" y="-330" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-30" edge="1" parent="1" source="sAc8dC_QL7qjKVBoc4Ot-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="sAc8dC_QL7qjKVBoc4Ot-26">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="550" y="430" />
+              <mxPoint x="-240" y="430" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-33" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Private Subnet EC2 instance (request to download Nginx package) -&amp;gt; The request checks the route table -&amp;gt; It finds an entry saying 0.0.0.0/0 -&amp;gt; Nat Gateway -&amp;gt; The request reaches Nat Gateway (Ec2 instance with a public IP) -&amp;gt; Suppose Nat Gateway is in Private Subnet - &lt;b&gt;How will it reach the internet?&lt;/b&gt;" vertex="1">
+          <mxGeometry height="90" width="1060" x="-320" y="470" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-37" parent="1" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=12;fontStyle=0;container=1;pointerEvents=0;collapsible=0;recursiveResize=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_security_group;grStroke=0;strokeColor=#00A4A6;fillColor=#E6F6F7;verticalAlign=top;align=left;spacingLeft=30;fontColor=#147EBA;dashed=0;" value="Private subnet (ap-south-1a)" vertex="1">
+          <mxGeometry height="360" width="240" x="710" y="-40" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-38" parent="sAc8dC_QL7qjKVBoc4Ot-37" style="rounded=0;whiteSpace=wrap;html=1;" value="Route Table&lt;div&gt;&lt;b&gt;&amp;lt;VPC CIDR&amp;gt; -&amp;gt; local&lt;/b&gt;&lt;/div&gt;&lt;div&gt;0.0.0.0 -&amp;gt; NATGW&lt;b&gt;&lt;/b&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="190" x="25" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-39" parent="sAc8dC_QL7qjKVBoc4Ot-37" style="rounded=0;whiteSpace=wrap;html=1;" value="RDS: 10.40.0.10&lt;div&gt;I have to download a new patch for the MYSQL database&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="160" x="45" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-40" parent="sAc8dC_QL7qjKVBoc4Ot-37" style="rounded=0;whiteSpace=wrap;html=1;" value="EC2: 10.40.0.15&lt;div&gt;I have to download Nginx&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="170" x="40" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-41" edge="1" parent="1" source="sAc8dC_QL7qjKVBoc4Ot-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="sAc8dC_QL7qjKVBoc4Ot-40">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="140" y="340" />
+              <mxPoint x="730" y="340" />
+              <mxPoint x="730" y="140" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-42" edge="1" parent="1" source="sAc8dC_QL7qjKVBoc4Ot-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="sAc8dC_QL7qjKVBoc4Ot-37">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="260" y="240" />
+              <mxPoint x="260" y="420" />
+              <mxPoint x="830" y="420" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="sAc8dC_QL7qjKVBoc4Ot-47" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=50;" value="Singapore Region:&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Keep the backups:&lt;/div&gt;&lt;div&gt;Sync that AMI to Singapore&lt;/div&gt;" vertex="1">
+          <mxGeometry height="220" width="290" x="1096" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
