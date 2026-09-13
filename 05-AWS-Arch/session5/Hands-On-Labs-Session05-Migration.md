@@ -81,8 +81,6 @@ Complete:
 
 ## Lab 4 - Inspect AWS Transform and MGN
 
-Availability and permissions depend on the training account. Use a trainer demonstration or prepared screenshots when initialization is not allowed.
-
 1. Open **AWS Transform** in the AWS Console.
 2. Identify where an assessment or migration workspace is created.
 3. Open **AWS Transform MGN**.

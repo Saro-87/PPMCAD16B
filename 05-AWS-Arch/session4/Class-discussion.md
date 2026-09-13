@@ -47,6 +47,7 @@ How do you secure / encrypt your data at rest?
 to have proper backups in place
 
 
+Security Groups
 -------
 
 
@@ -57,6 +58,31 @@ If the application is accessed by users in different countries, then how do you 
 
 - Servers where you have the highest traffic from
 - Cloudfront - CDN (Content Delivery Network) - USA, Singapore, Australia - edge servers which will cache the website content
+
+
+when would you actually need to provision servers in both the regions where your users are?
+
+- Where the content is different
+- When most of the content is dynamic
+- Compliance, data residency part
+
+Hotel website is hosted in USA, now they are expanding to UK.. will they be able to use the same servers in USA and expand it by CDN?
+
+- Yes, if they are not storing any PI (Personal Information) data 
+- No, if they are storing any form of PI data.. As UK has GDPR compliance, and there is huge penalty if you are storing their citizens PI data to any other countries servers
+
+---
+
+Traffic is normally low but rises sharply when ticket sales open
+
+- from compute side: Autoscaling 
+- from database side:
+    - baseline your database instance to serve higher traffic
+    - the app should be created in such a way that it does not bombard the database, write database scripts in in an optimized way
+    - Read Replicas inside the RDS Database
+        - It is a readonly copy of your database
+        - update your application to point to Read replica for any read request and point to the main rds endpoint for any write request
+    - Use of the queue servers
 
 ---
 
